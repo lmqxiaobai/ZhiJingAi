@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.zhijingai.mapper.UserMapper">
+
+    <insert id="insert" parameterType="com.example.zhijingai.entitys.entity.User" >
+        insert into user (password, mailbox, create_time, update_time)
+        values ( #{password}, #{mailbox}, #{createTime}, #{updateTime});
+    </insert>
+</mapper>

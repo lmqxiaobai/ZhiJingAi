@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.zhijingai.mapper.SpaceMapper">
+    <update id="update">
+        update space
+        <set>
+            <if test="status != null"> status = #{status}, </if>
+            <if test="name != null"> name = #{name}, </if>
+            <if test="file != null"> file = #{file}, </if>
+            <if test="photo != null"> photo = #{photo}, </if>
+            <if test="updateTime != null"> update_time = #{updateTime} </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteList">
+        delete from space where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")"> #{id} </foreach>
+    </delete>
+
+    <select id="select" resultType="com.example.zhijingai.entitys.entity.Space">
+        select * from space
+        <where>
+            <if test="id != null"> and id = #{id} </if>
+            <if test="userId != null"> and user_id = #{userId} </if>
+            <if test="name != null"> and name like concat('%', #{name}, '%') </if>
+            <if test="status != null"> and status = #{status} </if>
+        </where>
+    </select>
+
+    <select id="pageQuery" resultType="com.example.zhijingai.entitys.vo.SpaceVO">
+        select * from space
+        <where>
+            <if test="name != null"> and name = #{name} </if>
+            <if test="status != null"> and status = #{status} </if>
+        </where>
+    </select>
+</mapper>

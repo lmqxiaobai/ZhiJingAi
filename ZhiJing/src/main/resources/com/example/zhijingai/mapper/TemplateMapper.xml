@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.zhijingai.mapper.TemplateMapper">
+    <!--查询模板表中所有数据的分页查询-->
+    <select id="allPageQuery" resultType="com.example.zhijingai.entitys.entity.Template">
+        select * from template
+                      -- 排序
+        order by create_time desc
+    </select>
+
+    <!--    用户端分页查询，给定小类别的集合id，然后返回相对应的模板数据集合-->
+    <select id="pageQuery" resultType="com.example.zhijingai.entitys.entity.Template">
+        SELECT DISTINCT t.*
+        FROM template t
+        JOIN connects c ON t.id = c.template_id
+        WHERE c.classification_id IN
+        <foreach collection="classificationIds" item="classificationId" separator="," open="(" close=")">
+            #{classificationId}
+        </foreach>
+        GROUP BY t.id HAVING COUNT(DISTINCT c.classification_id) = #{length}
+        -- 排序
+        order by create_time desc
+    </select>
+
+    <!--管理端总表的信息集合查询 -->
+    <select id="totalList" resultType="com.example.zhijingai.entitys.entity.Total">
+        select * from total
+    </select>
+
+    <!--    根据totalId 查询total表中对应数据-->
+    <select id="selectByIdTotal" resultType="com.example.zhijingai.entitys.entity.Total">
+        select * from total
+        where id = #{id}
+    </select>
+    <!--    管理端根据分类id去对应查询相关类别数据集合-->
+    <select id="classList" resultType="com.example.zhijingai.entitys.entity.Classification">
+        select * from classification
+        where total_id = #{totalId}
+        order by create_time
+    </select>
+
+
+    <!--    管理端添加模板信息-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into template(name,image,documentation,status,create_time, update_time,
+                             create_user,update_user)
+            value (#{name},#{image},#{documentation},#{status},#{createTime}, #{updateTime}, #{createUser},
+            #{updateUser})
+    </insert>
+
+    <!--    将分类id和模板id批量添加进connects表中-->
+    <insert id="insertConnect">
+        insert into connects(classification_id,template_id) VALUES
+            (#{classificationId},#{templateId})
+    </insert>
+
+    <!--    管理端添加total第一级分类名称-->
+    <insert id="insertTotal" useGeneratedKeys="true" keyProperty="id">
+        insert into total(name,create_time, update_time,create_user,update_user)
+            value (#{name},#{createTime}, #{updateTime}, #{createUser},#{updateUser})
+    </insert>
+
+    <!--  将第二级分类名称和第一级分类id存在classification表中-->
+    <insert id="insertClassification">
+        insert into classification(name,total_id,create_time, update_time,create_user,update_user)
+            value (#{name},#{totalId},#{createTime}, #{updateTime}, #{createUser},#{updateUser})
+    </insert>
+
+
+    <update id="update">
+        update template
+        <set>
+            <if test="name != null">
+                name = #{name},
+            </if>
+            <if test="image != null">
+                image = #{image},
+            </if>
+            <if test="documentation != null">
+                documentation = #{documentation},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+            <if test="updateUser != null">
+                update_user = #{updateUser},
+            </if>
+
+        </set>
+        where id = #{id}
+    </update>
+</mapper>
